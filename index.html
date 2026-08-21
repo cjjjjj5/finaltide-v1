@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinalTide — Ocean Photo &amp; Video Log</title>
+<meta name="description" content="A saltwater logbook — photos and film from surf sessions, dives, and days the ocean had something to say.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --abyss:#0b2e28;
+    --depth:#0f5c50;
+    --tide:#21c7b0;
+    --foam:#fdf6e9;
+    --flare:#ff6b35;
+    --sand:#f4b942;
+
+    --font-display:'Fraunces', serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+
+    --nav-h:64px;
+    --wave-h:34px;
+    --container:1200px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+
+  body{
+    margin:0;
+    background:var(--abyss);
+    color:var(--foam);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; }
+  img,video{ max-width:100%; display:block; }
+
+  .container{
+    max-width:var(--container);
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  ::selection{ background:var(--flare); color:var(--abyss); }
+
+  :focus-visible{
+    outline:2px solid var(--flare);
+    outline-offset:3px;
+  }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:fixed;
+    top:0; left:0; right:0;
+    height:var(--nav-h);
+    z-index:100;
+    display:flex;
+    align-items:center;
+    background:rgba(11,46,40,0.35);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(253,246,233,0.08);
+    transition:background 0.3s ease, border-color 0.3s ease;
+  }
+  .nav.is-scrolled{
+    background:rgba(11,46,40,0.85);
+    border-bottom-color:rgba(253,246,233,0.14);
+  }
+  .nav__inner{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+  }
+  .nav__right{
+    display:flex;
+    align-items:center;
+    gap:20px;
+  }
+  .nav__logo{
+    font-family:var(--font-display);
+    font-size:1.65rem;
+    font-weight:600;
+    letter-spacing:0.01em;
+    text-decoration:none;
+  }
+  .nav__logo span{ color:var(--flare); font-style:italic; }
+  .nav__links{
+    display:flex;
+    gap:28px;
+    list-style:none;
+    margin:0; padding:0;
+  }
+  .nav__links a{
+    text-decoration:none;
+    font-size:0.85rem;
+    font-family:var(--font-mono);
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:rgba(253,246,233,0.75);
+    transition:color 0.2s ease;
+  }
+  .nav__links a:hover{ color:var(--foam); }
+  .nav__toggle{
+    display:none;
+    background:none;
+    border:1px solid rgba(253,246,233,0.3);
+    color:var(--foam);
+    font-family:var(--font-mono);
+    font-size:0.75rem;
+    padding:6px 10px;
+    border-radius:2px;
+    cursor:pointer;
+  }
+
+  /* ---------- TIDE PROGRESS BAR (signature element) ---------- */
+  .tideline{
+    position:fixed;
+    top:var(--nav-h);
+    left:0; right:0;
+    height:var(--wave-h);
+    z-index:99;
+    background:rgba(11,46,40,0.55);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(253,246,233,0.06);
+    overflow:hidden;
+  }
+  .tideline svg{ width:100%; height:100%; display:block; }
+  .tideline path{
+    fill:none;
+    stroke:rgba(253,246,233,0.35);
+    stroke-width:2.5;
+  }
+  .tideline__dot{ fill:var(--flare); }
+  .tideline__label{
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    font-family:var(--font-mono);
+    font-size:0.65rem;
+    letter-spacing:0.08em;
+    color:rgba(253,246,233,0.55);
+    pointer-events:none;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding-top:calc(var(--nav-h) + var(--wave-h));
+    overflow:hidden;
+    background:
+      radial-gradient(60% 50% at 15% 20%, rgba(33,199,176,0.35), transparent 60%),
+      radial-gradient(50% 45% at 85% 75%, rgba(255,111,89,0.10), transparent 60%),
+      linear-gradient(180deg, #0f4038 0%, #0b2e28 55%, #051a15 100%);
+  }
+  .hero__caustics{
+    position:absolute;
+    inset:0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(253,246,233,0.05) 0, transparent 8%),
+      radial-gradient(circle at 60% 60%, rgba(253,246,233,0.04) 0, transparent 10%),
+      radial-gradient(circle at 80% 20%, rgba(253,246,233,0.05) 0, transparent 7%),
+      radial-gradient(circle at 40% 80%, rgba(253,246,233,0.03) 0, transparent 9%);
+    animation:drift 22s ease-in-out infinite alternate;
+    opacity:0.9;
+  }
+  @keyframes drift{
+    0%{ transform:translate(0,0) scale(1); }
+    100%{ transform:translate(-2%,2%) scale(1.05); }
+  }
+  .hero__content{
+    position:relative;
+    z-index:2;
+  }
+  .hero__eyebrow{
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--sand);
+    margin:0 0 18px;
+  }
+  .hero__title{
+    font-family:var(--font-display);
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(3.2rem, 10vw, 8rem);
+    line-height:0.95;
+    letter-spacing:-0.01em;
+    margin:0 0 24px;
+  }
+  .hero__title em{
+    font-style:italic;
+    font-weight:400;
+    color:var(--flare);
+  }
+  .hero__sub{
+    max-width:520px;
+    font-size:1.05rem;
+    color:rgba(253,246,233,0.78);
+    margin:0 0 40px;
+  }
+  .hero__actions{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:14px;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--font-mono);
+    font-size:0.8rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    text-decoration:none;
+    padding:14px 22px;
+    border-radius:2px;
+    transition:transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+  .btn--solid{
+    background:var(--flare);
+    color:var(--abyss);
+    font-weight:500;
+  }
+  .btn--solid:hover{ transform:translateY(-2px); }
+  .btn--ghost{
+    border:1px solid rgba(253,246,233,0.35);
+    color:var(--foam);
+  }
+  .btn--ghost:hover{ border-color:var(--foam); transform:translateY(-2px); }
+
+  .hero__divider{
+    position:relative;
+    z-index:2;
+    line-height:0;
+    margin-top:60px;
+  }
+  .hero__divider svg{ width:100%; height:150px; display:block; }
+  .hero__divider path{ fill:var(--abyss); }
+  .hero__divider .wave--back{ fill:var(--depth); opacity:0.55; }
+
+  /* ---------- SECTION SCAFFOLDING ---------- */
+  section{ position:relative; }
+  .section{ padding:110px 0; }
+  .section--tight{ padding:80px 0; }
+  .section__head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    margin-bottom:48px;
+    flex-wrap:wrap;
+  }
+  .section__eyebrow{
+    font-family:var(--font-mono);
+    font-size:0.75rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--tide);
+    margin:0 0 10px;
+  }
+  .section__title{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(2rem, 4vw, 3rem);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .section__note{
+    max-width:360px;
+    font-size:0.92rem;
+    color:rgba(253,246,233,0.6);
+    margin:0;
+  }
+
+  /* ---------- GALLERY ---------- */
+  .filters{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:36px;
+  }
+  .filter{
+    font-family:var(--font-mono);
+    font-size:0.75rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    background:none;
+    border:1px solid rgba(253,246,233,0.2);
+    color:rgba(253,246,233,0.65);
+    padding:9px 16px;
+    border-radius:20px;
+    cursor:pointer;
+    transition:all 0.2s ease;
+  }
+  .filter:hover{ border-color:rgba(253,246,233,0.5); color:var(--foam); }
+  .filter.is-active{
+    background:var(--foam);
+    border-color:var(--foam);
+    color:var(--abyss);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:20px;
+  }
+  .card{
+    position:relative;
+    border-radius:3px;
+    overflow:hidden;
+    aspect-ratio:4/5;
+    cursor:pointer;
+    border:none;
+    padding:0;
+    text-align:left;
+    background:var(--depth);
+    transition:transform 0.35s ease;
+  }
+  .grid .card:nth-child(3n+1){ grid-row:span 1; }
+  .card:hover{ transform:translateY(-4px); }
+  .card__media{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .card__media svg{ width:34%; opacity:0.28; }
+  .card--surf .card__media{ background:linear-gradient(160deg,#0f5c50,#21c7b0 60%,#a8e6cf); }
+  .card--dive .card__media{ background:linear-gradient(160deg,#04140f,#0f5c50 55%,#1c8c74); }
+  .card--sail .card__media{ background:linear-gradient(160deg,#158a72,#3fc9b0 55%,#dff5e8); }
+  .card--freedive .card__media{ background:linear-gradient(160deg,#02100c,#0f4038 60%,#158a72); }
+  .card--storm .card__media{ background:linear-gradient(160deg,#1c2420,#3d5c52 55%,#7fae9e); }
+  .card__badge{
+    position:absolute;
+    top:14px; left:14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--font-mono);
+    font-size:0.65rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    background:rgba(11,46,40,0.55);
+    padding:5px 9px;
+    border-radius:20px;
+    backdrop-filter:blur(4px);
+  }
+  .card__badge svg{ width:11px; height:11px; }
+  .card__caption{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:16px 16px 14px;
+    background:linear-gradient(0deg, rgba(6,26,22,0.85), transparent);
+  }
+  .card__caption h3{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:1.05rem;
+    margin:0 0 4px;
+  }
+  .card__caption p{
+    font-family:var(--font-mono);
+    font-size:0.7rem;
+    letter-spacing:0.04em;
+    color:rgba(253,246,233,0.65);
+    margin:0;
+  }
+  .card.is-hidden{ display:none; }
+
+  /* ---------- REELS ---------- */
+  .reels{
+    display:flex;
+    gap:20px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    scroll-snap-type:x proximity;
+  }
+  .reels::-webkit-scrollbar{ height:6px; }
+  .reels::-webkit-scrollbar-thumb{ background:rgba(253,246,233,0.2); border-radius:4px; }
+  .reel{
+    position:relative;
+    flex:0 0 260px;
+    aspect-ratio:9/16;
+    border-radius:4px;
+    overflow:hidden;
+    scroll-snap-align:start;
+    cursor:pointer;
+    border:none;
+    padding:0;
+  }
+  .reel--a{ background:linear-gradient(200deg,#0f5c50,#1c8c74 60%,#21c7b0); }
+  .reel--b{ background:linear-gradient(200deg,#02100c,#0f5c50 55%,#158a72); }
+  .reel--c{ background:linear-gradient(200deg,#1c2420,#3d5c52 60%,#5c8a76); }
+  .reel--d{ background:linear-gradient(200deg,#158a72,#3fc9b0 55%,#a8e6cf); }
+  .reel__play{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .reel__play svg{
+    width:52px; height:52px;
+    opacity:0.9;
+    transition:transform 0.2s ease;
+  }
+  .reel:hover .reel__play svg{ transform:scale(1.1); }
+  .reel__meta{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:14px;
+    background:linear-gradient(0deg, rgba(6,26,22,0.85), transparent);
+    font-family:var(--font-mono);
+    font-size:0.7rem;
+    letter-spacing:0.04em;
+    color:rgba(253,246,233,0.75);
+  }
+  .reel__meta strong{
+    display:block;
+    font-family:var(--font-display);
+    font-size:1rem;
+    color:var(--foam);
+    margin-bottom:2px;
+  }
+
+  /* ---------- ABOUT ---------- */
+  .about{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:64px;
+    align-items:center;
+  }
+  .about__visual{
+    aspect-ratio:1/1;
+    border-radius:3px;
+    background:
+      radial-gradient(70% 70% at 30% 20%, rgba(255,111,89,0.14), transparent 60%),
+      linear-gradient(160deg,#0f4038,#0f5c50 55%,#158a72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .about__visual svg{ width:40%; opacity:0.5; }
+  .about p{
+    color:rgba(253,246,233,0.78);
+    font-size:1.02rem;
+  }
+  .about__stats{
+    display:flex;
+    gap:36px;
+    margin-top:32px;
+    flex-wrap:wrap;
+  }
+  .stat b{
+    display:block;
+    font-family:var(--font-display);
+    font-size:2rem;
+    color:var(--flare);
+  }
+  .stat span{
+    font-family:var(--font-mono);
+    font-size:0.7rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:rgba(253,246,233,0.55);
+  }
+
+  /* ---------- CONTACT / FOOTER ---------- */
+  .footer-divider{ line-height:0; transform:rotate(180deg); }
+  .footer-divider svg{ width:100%; height:130px; display:block; }
+  .footer-divider path{ fill:var(--depth); }
+  .footer-divider .wave--back{ fill:var(--abyss); opacity:0.5; }
+
+  .footer{
+    background:var(--depth);
+    padding:70px 0 36px;
+  }
+  .footer__top{
+    display:flex;
+    justify-content:space-between;
+    gap:40px;
+    flex-wrap:wrap;
+    padding-bottom:44px;
+    border-bottom:1px solid rgba(253,246,233,0.1);
+  }
+  .footer__title{
+    font-family:var(--font-display);
+    font-size:2.1rem;
+    max-width:420px;
+    margin:0 0 20px;
+  }
+  .footer__socials{
+    display:flex;
+    gap:14px;
+  }
+  .footer__socials a{
+    width:38px; height:38px;
+    border:1px solid rgba(253,246,233,0.25);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    transition:border-color 0.2s ease, transform 0.2s ease;
+  }
+  .footer__socials a:hover{ border-color:var(--flare); transform:translateY(-2px); }
+  .footer__socials svg{ width:16px; height:16px; }
+  .footer__bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-top:26px;
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.04em;
+    color:rgba(253,246,233,0.5);
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  /* ---------- LIGHTBOX ---------- */
+  .lightbox{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    background:rgba(4,18,15,0.92);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:32px;
+  }
+  .lightbox.is-open{ display:flex; }
+  .lightbox__panel{
+    max-width:640px;
+    width:100%;
+    border-radius:4px;
+    overflow:hidden;
+    aspect-ratio:4/5;
+    position:relative;
+  }
+  .lightbox__caption{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:22px;
+    background:linear-gradient(0deg, rgba(6,26,22,0.9), transparent);
+  }
+  .lightbox__caption h3{
+    font-family:var(--font-display);
+    font-size:1.3rem;
+    margin:0 0 4px;
+  }
+  .lightbox__caption p{
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    color:rgba(253,246,233,0.65);
+    margin:0;
+  }
+  .lightbox__close{
+    position:absolute;
+    top:-44px; right:0;
+    background:none;
+    border:none;
+    color:var(--foam);
+    font-family:var(--font-mono);
+    font-size:0.8rem;
+    letter-spacing:0.06em;
+    cursor:pointer;
+    text-transform:uppercase;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 860px){
+    .nav__links{
+      position:fixed;
+      top:var(--nav-h);
+      right:0;
+      flex-direction:column;
+      background:rgba(11,46,40,0.97);
+      width:220px;
+      padding:24px;
+      gap:20px;
+      transform:translateX(100%);
+      transition:transform 0.25s ease;
+      border-left:1px solid rgba(253,246,233,0.1);
+    }
+    .nav__links.is-open{ transform:translateX(0); }
+    .nav__toggle{ display:block; }
+    .grid{ grid-template-columns:repeat(2, 1fr); }
+    .about{ grid-template-columns:1fr; }
+    .tideline__label{ display:none; }
+  }
+  @media (max-width: 540px){
+    .container{ padding:0 20px; }
+    .grid{ grid-template-columns:1fr 1fr; gap:12px; }
+    .about__stats{ gap:24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="container nav__inner">
+    <a href="#top" class="nav__logo">FINAL<span>TIDE</span></a>
+    <div class="nav__right">
+      <ul class="nav__links" id="navLinks">
+        <li><a href="#log">Log</a></li>
+        <li><a href="#reels">Reels</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">MENU</button>
+    </div>
+  </div>
+</nav>
+
+<div class="tideline">
+  <svg viewBox="0 0 1000 34" preserveAspectRatio="none">
+    <path d="M0,17 C125,-8 250,42 375,17 C500,-8 625,42 750,17 C875,-8 1000,42 1000,17" />
+    <circle class="tideline__dot" id="tideDot" cx="0" cy="17" r="4.5"></circle>
+  </svg>
+  <span class="tideline__label" id="tideLabel">LOW · 00:00</span>
+</div>
+
+<header class="hero" id="top">
+  <div class="hero__caustics" aria-hidden="true"></div>
+  <div class="container hero__content">
+    <p class="hero__eyebrow">A Saltwater Logbook</p>
+    <p class="hero__sub">Photos and film from surf sessions, dives, and the days the ocean had something to say. Every entry is time-stamped, every swell logged.</p>
+    <div class="hero__actions">
+      <a href="#contact" class="btn btn--solid">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        Upload
+      </a>
+      <a href="#reels" class="btn btn--ghost">Watch the Reels</a>
+    </div>
+  </div>
+  <div class="hero__divider" aria-hidden="true">
+    <svg viewBox="0 0 1200 150" preserveAspectRatio="none">
+      <path class="wave--back" d="M0,70 C150,140 300,0 450,70 C600,140 750,0 900,70 C1050,140 1150,30 1200,70 L1200,150 L0,150 Z"/>
+      <path d="M0,95 C150,150 300,30 450,95 C600,150 750,30 900,95 C1050,150 1150,60 1200,95 L1200,150 L0,150 Z"/>
+    </svg>
+  </div>
+</header>
+
+<main>
+  <!-- ================= GALLERY ================= -->
+  <section class="section" id="log">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <p class="section__eyebrow">Entries 001 — 009</p>
+          <h2 class="section__title">The Log</h2>
+        </div>
+        <p class="section__note">Every session, sorted by water. Tap an entry to open it full-frame.</p>
+      </div>
+
+      <div class="filters" id="filters">
+        <button class="filter is-active" data-filter="all">All</button>
+        <button class="filter" data-filter="surf">Surf</button>
+        <button class="filter" data-filter="dive">Dive</button>
+        <button class="filter" data-filter="sail">Sail</button>
+        <button class="filter" data-filter="freedive">Freedive</button>
+        <button class="filter" data-filter="storm">Storm Swell</button>
+      </div>
+
+      <!--
+        REPLACE-ME: Each .card below is a placeholder tile.
+        To use your own photo, swap the .card__media div's background
+        for an <img src="assets/photos/your-file.jpg" alt="..."> inside it.
+        Keep the data-filter and data-type attributes so filtering + the
+        lightbox keep working.
+      -->
+      <div class="grid" id="grid">
+
+        <button class="card card--surf" data-filter="surf" data-type="photo" data-title="Dawn Patrol" data-meta="Surf · 34.02°N — 06:14">
+          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M2 18c2 2 4 2 6 0s4-2 6 0 4 2 6 0M2 12c2 2 4 2 6 0s4-2 6 0 4 2 6 0"/></svg></div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+          <div class="card__caption"><h3>Dawn Patrol</h3><p>SURF · 34.02°N · 06:14</p></div>
+        </button>
+
+        <button class="card card--dive" data-filter="dive" data-type="video" data-title="Wreck at 30m" data-meta="Dive · Reef Channel — 11:40">
+          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
+          <div class="card__caption"><h3>Wreck at 30m</h3><p>DIVE · REEF CHANNEL · 11:40</p></div>
+        </button>
+
+        <button class="card card--sail" data-filter="sail" data-type="photo" data-title="Windward Run" data-meta="Sail · Outer Bay — 15:02">
+          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M12 2v18M12 4l7 8H5l7-8zM4 20h16"/></svg></div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+          <div class="card__caption"><h3>Windward Run</h3><p>SAIL · OUTER BAY · 15:02</p></div>
+        </button>
+
+        <button class="card card--freedive" data-filter="freedive" data-type="photo" data-title="Blue Hole Descent" data-meta="Freedive · -22m — 09:51">
+          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M12 21c-4-4-7-7.5-7-11a7 7 0 0 1 14 0c0 3.5-3 7-7 11z"/></svg></div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+          <div class="card__caption"><h3>Blue Hole Descent</h3><p>FREEDIVE · -22M · 09:51</p></div>
+        </button>
+
+        <button class="card card--storm" data-filter="storm" data-type="video" data-title="Groundswell, Day 3" data-meta="Storm Swell · North Point — 17:23">
+          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M3 15h18M5 19h14M4 11c1-3 3-5 6-5 2 0 3 1 4 2 1-1 3-1 4 1 2 .5 3 2 3 3"/></svg></div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
+          <div class="card__caption"><h3>Groundswell, Day 3</h3><p>STORM SWELL · NORTH POINT · 17:23</p></div>
+        </button>
+
+        <button class="card card--surf" data-filter="surf" data-type="photo" data-title="Left-Hander" data-meta="Surf · Point Break — 07:35">
+          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M2 18c2 2 4 2 6 0s4-2 6 0 4 2 6 0M2 12c2 2 4 2 6 0s4-2 6 0 4 2 6 0"/></svg></div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+          <div class="card__caption"><h3>Left-Hander</h3><p>SURF · POINT BREAK · 07:35</p></div>
+        </button>
+
+        <button class="card card--dive" data-filter="dive" data-type="photo" data-title="Reef Wall" data-meta="Dive · South Wall — 13:10">
+          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+          <div class="card__caption"><h3>Reef Wall</h3><p>DIVE · SOUTH WALL · 13:10</p></div>
+        </button>
+
+        <button class="card card--sail" data-filter="sail" data-type="video" data-title="Regatta Start" data-meta="Sail · Harbor Line — 10:00">
+          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M12 2v18M12 4l7 8H5l7-8zM4 20h16"/></svg></div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
+          <div class="card__caption"><h3>Regatta Start</h3><p>SAIL · HARBOR LINE · 10:00</p></div>
+        </button>
+
+        <button class="card card--storm" data-filter="storm" data-type="photo" data-title="Shorebreak" data-meta="Storm Swell · Main Beach — 16:48">
+          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M3 15h18M5 19h14M4 11c1-3 3-5 6-5 2 0 3 1 4 2 1-1 3-1 4 1 2 .5 3 2 3 3"/></svg></div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+          <div class="card__caption"><h3>Shorebreak</h3><p>STORM SWELL · MAIN BEACH · 16:48</p></div>
+        </button>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REELS ================= -->
+  <section class="section section--tight" id="reels" style="background:var(--depth);">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <p class="section__eyebrow">Motion</p>
+          <h2 class="section__title">Reels</h2>
+        </div>
+        <p class="section__note">Short clips from the water. Swap these placeholders for your own &lt;video&gt; files.</p>
+      </div>
+
+      <!--
+        REPLACE-ME: swap each .reel button's background for a real
+        <video muted loop playsinline poster="assets/videos/poster.jpg">
+          <source src="assets/videos/your-clip.mp4" type="video/mp4">
+        </video>
+      -->
+      <div class="reels">
+        <button class="reel reel--a" data-title="Barrel, North Point" data-meta="0:18 · Surf">
+          <span class="reel__play"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="reel__meta"><strong>Barrel, North Point</strong>0:18 · Surf</span>
+        </button>
+        <button class="reel reel--b" data-title="Night Dive" data-meta="1:04 · Dive">
+          <span class="reel__play"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="reel__meta"><strong>Night Dive</strong>1:04 · Dive</span>
+        </button>
+        <button class="reel reel--c" data-title="Storm Rolling In" data-meta="0:42 · Storm Swell">
+          <span class="reel__play"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="reel__meta"><strong>Storm Rolling In</strong>0:42 · Storm Swell</span>
+        </button>
+        <button class="reel reel--d" data-title="Spinnaker Run" data-meta="0:31 · Sail">
+          <span class="reel__play"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="reel__meta"><strong>Spinnaker Run</strong>0:31 · Sail</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section class="section" id="about">
+    <div class="container about">
+      <div class="about__visual" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      </div>
+      <div>
+        <p class="section__eyebrow">About the Log</p>
+        <h2 class="section__title">Kept by hand, held by the tide.</h2>
+        <p>It started as a way to keep track of the days worth remembering — the dawn sessions, the dives that ran long, the swells that showed up uninvited. No filters, no captions written after the fact. Just what the water looked like when we were in it.</p>
+        <div class="about__stats">
+          <div class="stat"><b>190+</b><span>Sessions Logged</span></div>
+          <div class="stat"><b>14</b><span>Coastlines</span></div>
+          <div class="stat"><b>6</b><span>Years Running</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="footer-divider" aria-hidden="true">
+  <svg viewBox="0 0 1200 130" preserveAspectRatio="none">
+    <path class="wave--back" d="M0,60 C150,130 300,0 450,60 C600,130 750,0 900,60 C1050,130 1150,25 1200,60 L1200,0 L0,0 Z"/>
+    <path d="M0,85 C150,20 300,130 450,85 C600,20 750,130 900,85 C1050,20 1150,110 1200,85 L1200,0 L0,0 Z"/>
+  </svg>
+</div>
+
+<footer class="footer" id="contact">
+  <div class="container">
+    <div class="footer__top">
+      <div>
+        <h3 class="footer__title">Got a photo or clip worth adding to the log?</h3>
+        <a href="mailto:hello@finaltide.example" class="btn btn--solid">hello@finaltide.example</a>
+      </div>
+      <div class="footer__socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M11 10l4 2-4 2z" fill="#fdf6e9" stroke="none"/></svg></a>
+        <a href="#" aria-label="Strava"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.6"><path d="M8 3l5 10h-3l3 8-8-11h3z"/></svg></a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; <span id="year"></span> FinalTide. All tides logged, none repeated.</span>
+      <span>Built for Cloudflare Pages</span>
+    </div>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox__panel" id="lightboxPanel">
+    <button class="lightbox__close" id="lightboxClose">Close ✕</button>
+    <div class="lightbox__caption">
+      <h3 id="lightboxTitle"></h3>
+      <p id="lightboxMeta"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Nav scroll state + mobile toggle
+  const nav = document.getElementById('nav');
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+
+  navToggle.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('is-open');
+    navToggle.setAttribute('aria-expanded', open);
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    navLinks.classList.remove('is-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }));
+
+  // Tide progress dot along the wave path, synced to scroll position
+  const tidePath = document.querySelector('.tideline path');
+  const tideDot = document.getElementById('tideDot');
+  const tideLabel = document.getElementById('tideLabel');
+  const pathLength = tidePath.getTotalLength();
+
+  function tideTimeLabel(fraction){
+    const totalMinutes = Math.round(fraction * 12 * 60); // 12hr tide cycle feel
+    const h = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+    const m = String(totalMinutes % 60).padStart(2, '0');
+    const phase = fraction < 0.5 ? 'RISING' : 'FALLING';
+    return `${phase} · ${h}:${m}`;
+  }
+
+  let ticking = false;
+  function updateTide(){
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const fraction = docHeight > 0 ? Math.min(Math.max(scrollTop / docHeight, 0), 1) : 0;
+    const point = tidePath.getPointAtLength(fraction * pathLength);
+    tideDot.setAttribute('cx', point.x);
+    tideDot.setAttribute('cy', point.y);
+    tideLabel.textContent = tideTimeLabel(fraction);
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if(!ticking){
+      requestAnimationFrame(updateTide);
+      ticking = true;
+    }
+  });
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('is-scrolled', window.scrollY > 20);
+  });
+  updateTide();
+
+  // Gallery filtering
+  const filters = document.querySelectorAll('.filter');
+  const cards = document.querySelectorAll('.card');
+  filters.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filters.forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const val = btn.dataset.filter;
+      cards.forEach(card => {
+        const show = val === 'all' || card.dataset.filter === val;
+        card.classList.toggle('is-hidden', !show);
+      });
+    });
+  });
+
+  // Lightbox
+  const lightbox = document.getElementById('lightbox');
+  const lightboxPanel = document.getElementById('lightboxPanel');
+  const lightboxTitle = document.getElementById('lightboxTitle');
+  const lightboxMeta = document.getElementById('lightboxMeta');
+  const lightboxClose = document.getElementById('lightboxClose');
+
+  function openLightbox(card){
+    lightboxPanel.className = 'lightbox__panel ' + Array.from(card.classList).find(c => c.startsWith('card--')).replace('card--', 'card--');
+    lightboxPanel.style.background = getComputedStyle(card.querySelector('.card__media')).backgroundImage !== 'none'
+      ? getComputedStyle(card.querySelector('.card__media')).backgroundImage
+      : getComputedStyle(card.querySelector('.card__media')).background;
+    lightboxTitle.textContent = card.dataset.title;
+    lightboxMeta.textContent = card.dataset.meta;
+    lightbox.classList.add('is-open');
+  }
+  cards.forEach(card => card.addEventListener('click', () => openLightbox(card)));
+  document.querySelectorAll('.reel').forEach(reel => {
+    reel.addEventListener('click', () => {
+      lightboxPanel.style.background = getComputedStyle(reel).backgroundImage;
+      lightboxTitle.textContent = reel.dataset.title;
+      lightboxMeta.textContent = reel.dataset.meta;
+      lightbox.classList.add('is-open');
+    });
+  });
+  lightboxClose.addEventListener('click', () => lightbox.classList.remove('is-open'));
+  lightbox.addEventListener('click', (e) => { if(e.target === lightbox) lightbox.classList.remove('is-open'); });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') lightbox.classList.remove('is-open'); });
+</script>
+
+</body>
+</html>
