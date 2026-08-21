@@ -348,6 +348,40 @@
     justify-content:center;
   }
   .card__media svg{ width:34%; opacity:0.28; }
+  .card__youtube-media{
+    background:#071c24;
+  }
+  .card__youtube-media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .card__youtube-media::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(0deg, rgba(4,15,19,0.65), transparent 60%);
+    pointer-events:none;
+  }
+  .card__youtube-play{
+    position:absolute;
+    z-index:1;
+    width:54px;
+    height:54px;
+    border-radius:50%;
+    background:rgba(7,28,36,0.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+  }
+  .card__youtube-play svg{
+    width:24px;
+    height:24px;
+    margin-left:3px;
+  }
   .card--surf .card__media{ background:linear-gradient(160deg,#0e3a45,#21c7b0 60%,#a8e6cf); }
   .card--dive .card__media{ background:linear-gradient(160deg,#020c10,#0e3a45 55%,#1c8c74); }
   .card--sail .card__media{ background:linear-gradient(160deg,#158a72,#3fc9b0 55%,#dff5e8); }
@@ -428,6 +462,39 @@
     transition:transform 0.2s ease;
   }
   .reel:hover .reel__play svg{ transform:scale(1.1); }
+
+  /* ---------- YOUTUBE REELS ---------- */
+  .reel--youtube{
+    position:relative;
+    background:#071c24;
+  }
+  .reel--youtube .reel__thumb{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    background:#0e3a45;
+  }
+  .reel--youtube::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(0deg, rgba(4,15,19,0.9), transparent 55%);
+    pointer-events:none;
+  }
+  .reel--youtube .reel__play,
+  .reel--youtube .reel__meta{
+    z-index:2;
+  }
+  .youtube-player{
+    width:100%;
+    max-width:900px;
+    aspect-ratio:16/9;
+    border:0;
+    border-radius:4px;
+    display:block;
+  }
   .reel__meta{
     position:absolute;
     left:0; right:0; bottom:0;
@@ -554,12 +621,14 @@
   }
   .lightbox.is-open{ display:flex; }
   .lightbox__panel{
-    max-width:640px;
+    max-width:900px;
     width:100%;
     border-radius:4px;
-    overflow:hidden;
-    aspect-ratio:4/5;
+    overflow:visible;
     position:relative;
+  }
+  .lightbox__panel.is-youtube{
+    max-width:900px;
   }
   .lightbox__caption{
     position:absolute;
@@ -671,10 +740,10 @@
     <div class="container">
       <div class="section__head">
         <div>
-          <p class="section__eyebrow">Entries 001 — 009</p>
+          <p class="section__eyebrow">Video Entries 001 — 009</p>
           <h2 class="section__title">The Log</h2>
         </div>
-        <p class="section__note">Every session, sorted by water. Tap an entry to open it full-frame.</p>
+        <p class="section__note">Every session, sorted by water. Add a YouTube video ID to any entry and tap it to watch.</p>
       </div>
 
       <div class="filters" id="filters">
@@ -695,61 +764,137 @@
       -->
       <div class="grid" id="grid">
 
-        <button class="card card--surf" data-filter="surf" data-type="photo" data-title="Dawn Patrol" data-meta="Surf · 34.02°N — 06:14">
-          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M2 18c2 2 4 2 6 0s4-2 6 0 4 2 6 0M2 12c2 2 4 2 6 0s4-2 6 0 4 2 6 0"/></svg></div>
-          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+        <!--
+          YOUTUBE LOG ENTRIES:
+          Change data-video-id to the ID from your YouTube URL.
+
+          Example:
+          https://www.youtube.com/watch?v=ABC123XYZ
+          becomes:
+          data-video-id="ABC123XYZ"
+
+          You can change the title, category, location/time, and video ID.
+          Copy an entire <button class="card ..."> block to add more entries.
+        -->
+
+        <button class="card card--surf" data-filter="surf" data-type="youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Dawn Patrol" data-meta="Surf · 34.02°N — 06:14">
+          <div class="card__media card__youtube-media">
+            <img src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Dawn Patrol">
+            <span class="card__youtube-play">
+              <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          </div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
           <div class="card__caption"><h3>Dawn Patrol</h3><p>SURF · 34.02°N · 06:14</p></div>
         </button>
 
-        <button class="card card--dive" data-filter="dive" data-type="video" data-title="Wreck at 30m" data-meta="Dive · Reef Channel — 11:40">
-          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
+        <button class="card card--dive" data-filter="dive" data-type="youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Wreck at 30m" data-meta="Dive · Reef Channel — 11:40">
+          <div class="card__media card__youtube-media">
+            <img src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Wreck at 30m">
+            <span class="card__youtube-play">
+              <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          </div>
           <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
           <div class="card__caption"><h3>Wreck at 30m</h3><p>DIVE · REEF CHANNEL · 11:40</p></div>
         </button>
 
-        <button class="card card--sail" data-filter="sail" data-type="photo" data-title="Windward Run" data-meta="Sail · Outer Bay — 15:02">
-          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M12 2v18M12 4l7 8H5l7-8zM4 20h16"/></svg></div>
-          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+        <button class="card card--sail" data-filter="sail" data-type="youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Windward Run" data-meta="Sail · Outer Bay — 15:02">
+          <div class="card__media card__youtube-media">
+            <img src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Windward Run">
+            <span class="card__youtube-play">
+              <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          </div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
           <div class="card__caption"><h3>Windward Run</h3><p>SAIL · OUTER BAY · 15:02</p></div>
         </button>
 
-        <button class="card card--freedive" data-filter="freedive" data-type="photo" data-title="Blue Hole Descent" data-meta="Freedive · -22m — 09:51">
-          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M12 21c-4-4-7-7.5-7-11a7 7 0 0 1 14 0c0 3.5-3 7-7 11z"/></svg></div>
-          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+        <button class="card card--freedive" data-filter="freedive" data-type="youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Blue Hole Descent" data-meta="Freedive · -22m — 09:51">
+          <div class="card__media card__youtube-media">
+            <img src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Blue Hole Descent">
+            <span class="card__youtube-play">
+              <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          </div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
           <div class="card__caption"><h3>Blue Hole Descent</h3><p>FREEDIVE · -22M · 09:51</p></div>
         </button>
 
-        <button class="card card--storm" data-filter="storm" data-type="video" data-title="Groundswell, Day 3" data-meta="Storm Swell · North Point — 17:23">
-          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M3 15h18M5 19h14M4 11c1-3 3-5 6-5 2 0 3 1 4 2 1-1 3-1 4 1 2 .5 3 2 3 3"/></svg></div>
+        <button class="card card--storm" data-filter="storm" data-type="youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Groundswell, Day 3" data-meta="Storm Swell · North Point — 17:23">
+          <div class="card__media card__youtube-media">
+            <img src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Groundswell, Day 3">
+            <span class="card__youtube-play">
+              <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          </div>
           <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
           <div class="card__caption"><h3>Groundswell, Day 3</h3><p>STORM SWELL · NORTH POINT · 17:23</p></div>
         </button>
 
-        <button class="card card--surf" data-filter="surf" data-type="photo" data-title="Left-Hander" data-meta="Surf · Point Break — 07:35">
-          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M2 18c2 2 4 2 6 0s4-2 6 0 4 2 6 0M2 12c2 2 4 2 6 0s4-2 6 0 4 2 6 0"/></svg></div>
-          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+        <button class="card card--surf" data-filter="surf" data-type="youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Left-Hander" data-meta="Surf · Point Break — 07:35">
+          <div class="card__media card__youtube-media">
+            <img src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Left-Hander">
+            <span class="card__youtube-play">
+              <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          </div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
           <div class="card__caption"><h3>Left-Hander</h3><p>SURF · POINT BREAK · 07:35</p></div>
         </button>
 
-        <button class="card card--dive" data-filter="dive" data-type="photo" data-title="Reef Wall" data-meta="Dive · South Wall — 13:10">
-          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
-          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+        <button class="card card--dive" data-filter="dive" data-type="youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Reef Wall" data-meta="Dive · South Wall — 13:10">
+          <div class="card__media card__youtube-media">
+            <img src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Reef Wall">
+            <span class="card__youtube-play">
+              <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          </div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
           <div class="card__caption"><h3>Reef Wall</h3><p>DIVE · SOUTH WALL · 13:10</p></div>
         </button>
 
-        <button class="card card--sail" data-filter="sail" data-type="video" data-title="Regatta Start" data-meta="Sail · Harbor Line — 10:00">
-          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M12 2v18M12 4l7 8H5l7-8zM4 20h16"/></svg></div>
+        <button class="card card--sail" data-filter="sail" data-type="youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Regatta Start" data-meta="Sail · Harbor Line — 10:00">
+          <div class="card__media card__youtube-media">
+            <img src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Regatta Start">
+            <span class="card__youtube-play">
+              <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          </div>
           <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
           <div class="card__caption"><h3>Regatta Start</h3><p>SAIL · HARBOR LINE · 10:00</p></div>
         </button>
 
-        <button class="card card--storm" data-filter="storm" data-type="photo" data-title="Shorebreak" data-meta="Storm Swell · Main Beach — 16:48">
-          <div class="card__media"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="1.4"><path d="M3 15h18M5 19h14M4 11c1-3 3-5 6-5 2 0 3 1 4 2 1-1 3-1 4 1 2 .5 3 2 3 3"/></svg></div>
-          <span class="card__badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fdf6e9" stroke-width="2"><path d="M4 17l4-4 3 3 6-6 3 3"/></svg>Photo</span>
+        <button class="card card--storm" data-filter="storm" data-type="youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Shorebreak" data-meta="Storm Swell · Main Beach — 16:48">
+          <div class="card__media card__youtube-media">
+            <img src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg" alt="Shorebreak">
+            <span class="card__youtube-play">
+              <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          </div>
+          <span class="card__badge"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>Video</span>
           <div class="card__caption"><h3>Shorebreak</h3><p>STORM SWELL · MAIN BEACH · 16:48</p></div>
         </button>
 
-      </div>
+      </div></div>
     </div>
   </section>
 
@@ -761,32 +906,72 @@
           <p class="section__eyebrow">Motion</p>
           <h2 class="section__title">Reels</h2>
         </div>
-        <p class="section__note">Short clips from the water. Swap these placeholders for your own &lt;video&gt; files.</p>
+        <p class="section__note">Featured vertical clips. Your main video library is now in The Log above.</p>
       </div>
 
       <!--
-        REPLACE-ME: swap each .reel button's background for a real
-        <video muted loop playsinline poster="assets/videos/poster.jpg">
-          <source src="assets/videos/your-clip.mp4" type="video/mp4">
-        </video>
+        YOUTUBE REELS:
+        Change data-video-id to the ID from the YouTube URL.
+        Example:
+        https://www.youtube.com/watch?v=dQw4w9WgXcQ
+        data-video-id="dQw4w9WgXcQ"
+
+        You can add more .reel elements below whenever you want.
       -->
       <div class="reels">
-        <button class="reel reel--a" data-title="Barrel, North Point" data-meta="0:18 · Surf">
-          <span class="reel__play"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg></span>
+
+        <button class="reel reel--youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Barrel, North Point"
+                data-meta="0:18 · Surf">
+          <img class="reel__thumb"
+               src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg"
+               alt="Barrel, North Point">
+          <span class="reel__play">
+            <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+          </span>
           <span class="reel__meta"><strong>Barrel, North Point</strong>0:18 · Surf</span>
         </button>
-        <button class="reel reel--b" data-title="Night Dive" data-meta="1:04 · Dive">
-          <span class="reel__play"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg></span>
+
+        <button class="reel reel--youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Night Dive"
+                data-meta="1:04 · Dive">
+          <img class="reel__thumb"
+               src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg"
+               alt="Night Dive">
+          <span class="reel__play">
+            <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+          </span>
           <span class="reel__meta"><strong>Night Dive</strong>1:04 · Dive</span>
         </button>
-        <button class="reel reel--c" data-title="Storm Rolling In" data-meta="0:42 · Storm Swell">
-          <span class="reel__play"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg></span>
+
+        <button class="reel reel--youtube"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Storm Rolling In"
+                data-meta="0:42 · Storm Swell">
+          <img class="reel__thumb"
+               src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg"
+               alt="Storm Rolling In">
+          <span class="reel__play">
+            <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+          </span>
           <span class="reel__meta"><strong>Storm Rolling In</strong>0:42 · Storm Swell</span>
         </button>
-        <button class="reel reel--d" data-title="Spinnaker Run" data-meta="0:31 · Sail">
-          <span class="reel__play"><svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg></span>
+
+        <button class="reel--youtube reel reel--d"
+                data-video-id="M7lc1UVf-VE"
+                data-title="Spinnaker Run"
+                data-meta="0:31 · Sail">
+          <img class="reel__thumb"
+               src="https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg"
+               alt="Spinnaker Run">
+          <span class="reel__play">
+            <svg viewBox="0 0 24 24" fill="#fdf6e9"><path d="M8 5v14l11-7z"/></svg>
+          </span>
           <span class="reel__meta"><strong>Spinnaker Run</strong>0:31 · Sail</span>
         </button>
+
       </div>
     </div>
   </section>
@@ -841,6 +1026,7 @@
 <div class="lightbox" id="lightbox">
   <div class="lightbox__panel" id="lightboxPanel">
     <button class="lightbox__close" id="lightboxClose">Close ✕</button>
+    <div id="lightboxMedia"></div>
     <div class="lightbox__caption">
       <h3 id="lightboxTitle"></h3>
       <p id="lightboxMeta"></p>
@@ -920,31 +1106,86 @@
   // Lightbox
   const lightbox = document.getElementById('lightbox');
   const lightboxPanel = document.getElementById('lightboxPanel');
+  const lightboxMedia = document.getElementById('lightboxMedia');
   const lightboxTitle = document.getElementById('lightboxTitle');
   const lightboxMeta = document.getElementById('lightboxMeta');
   const lightboxClose = document.getElementById('lightboxClose');
 
-  function openLightbox(card){
-    lightboxPanel.className = 'lightbox__panel ' + Array.from(card.classList).find(c => c.startsWith('card--')).replace('card--', 'card--');
-    lightboxPanel.style.background = getComputedStyle(card.querySelector('.card__media')).backgroundImage !== 'none'
-      ? getComputedStyle(card.querySelector('.card__media')).backgroundImage
-      : getComputedStyle(card.querySelector('.card__media')).background;
+  function clearLightboxMedia(){
+    lightboxMedia.innerHTML = '';
+    lightboxPanel.classList.remove('is-youtube');
+    lightboxPanel.style.background = '';
+  }
+
+  function openLogLightbox(card){
+    const videoId = card.dataset.videoId;
+
+    if(videoId){
+      clearLightboxMedia();
+      lightboxPanel.classList.add('is-youtube');
+
+      const iframe = document.createElement('iframe');
+      iframe.className = 'youtube-player';
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      iframe.title = card.dataset.title || 'FinalTide YouTube video';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+
+      lightboxMedia.appendChild(iframe);
+    } else {
+      clearLightboxMedia();
+      const media = card.querySelector('.card__media');
+      lightboxPanel.style.background = getComputedStyle(media).backgroundImage !== 'none'
+        ? getComputedStyle(media).backgroundImage
+        : getComputedStyle(media).background;
+    }
+
     lightboxTitle.textContent = card.dataset.title;
     lightboxMeta.textContent = card.dataset.meta;
     lightbox.classList.add('is-open');
   }
-  cards.forEach(card => card.addEventListener('click', () => openLightbox(card)));
+
+  function openYoutubeLightbox(reel){
+    clearLightboxMedia();
+    const videoId = reel.dataset.videoId;
+
+    lightboxPanel.classList.add('is-youtube');
+
+    const iframe = document.createElement('iframe');
+    iframe.className = 'youtube-player';
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+    iframe.title = reel.dataset.title || 'FinalTide YouTube video';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+
+    lightboxMedia.appendChild(iframe);
+    lightboxTitle.textContent = reel.dataset.title;
+    lightboxMeta.textContent = reel.dataset.meta;
+    lightbox.classList.add('is-open');
+  }
+
+  cards.forEach(card => card.addEventListener('click', () => openLogLightbox(card)));
+
   document.querySelectorAll('.reel').forEach(reel => {
     reel.addEventListener('click', () => {
-      lightboxPanel.style.background = getComputedStyle(reel).backgroundImage;
-      lightboxTitle.textContent = reel.dataset.title;
-      lightboxMeta.textContent = reel.dataset.meta;
-      lightbox.classList.add('is-open');
+      if(reel.dataset.videoId){
+        openYoutubeLightbox(reel);
+      }
     });
   });
-  lightboxClose.addEventListener('click', () => lightbox.classList.remove('is-open'));
-  lightbox.addEventListener('click', (e) => { if(e.target === lightbox) lightbox.classList.remove('is-open'); });
-  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') lightbox.classList.remove('is-open'); });
+
+  function closeLightbox(){
+    lightbox.classList.remove('is-open');
+    clearLightboxMedia();
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => {
+    if(e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeLightbox();
+  });
 </script>
 
 </body>
