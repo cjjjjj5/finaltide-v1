@@ -12,8 +12,8 @@
 
 <style>
   :root{
-    --abyss:#0b2e28;
-    --depth:#0f5c50;
+    --abyss:#071c24;
+    --depth:#0e3a45;
     --tide:#21c7b0;
     --foam:#fdf6e9;
     --flare:#ff6b35;
@@ -68,14 +68,14 @@
     z-index:100;
     display:flex;
     align-items:center;
-    background:rgba(11,46,40,0.35);
+    background:rgba(7,28,36,0.35);
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
     border-bottom:1px solid rgba(253,246,233,0.08);
     transition:background 0.3s ease, border-color 0.3s ease;
   }
   .nav.is-scrolled{
-    background:rgba(11,46,40,0.85);
+    background:rgba(7,28,36,0.85);
     border-bottom-color:rgba(253,246,233,0.14);
   }
   .nav__inner{
@@ -133,7 +133,7 @@
     left:0; right:0;
     height:var(--wave-h);
     z-index:99;
-    background:rgba(11,46,40,0.55);
+    background:rgba(7,28,36,0.55);
     backdrop-filter:blur(6px);
     -webkit-backdrop-filter:blur(6px);
     border-bottom:1px solid rgba(253,246,233,0.06);
@@ -170,7 +170,7 @@
     background:
       radial-gradient(60% 50% at 15% 20%, rgba(33,199,176,0.35), transparent 60%),
       radial-gradient(50% 45% at 85% 75%, rgba(255,111,89,0.10), transparent 60%),
-      linear-gradient(180deg, #0f4038 0%, #0b2e28 55%, #051a15 100%);
+      linear-gradient(180deg, #0a2530 0%, #071c24 55%, #05141a 100%);
   }
   .hero__caustics{
     position:absolute;
@@ -348,10 +348,10 @@
     justify-content:center;
   }
   .card__media svg{ width:34%; opacity:0.28; }
-  .card--surf .card__media{ background:linear-gradient(160deg,#0f5c50,#21c7b0 60%,#a8e6cf); }
-  .card--dive .card__media{ background:linear-gradient(160deg,#04140f,#0f5c50 55%,#1c8c74); }
+  .card--surf .card__media{ background:linear-gradient(160deg,#0e3a45,#21c7b0 60%,#a8e6cf); }
+  .card--dive .card__media{ background:linear-gradient(160deg,#020c10,#0e3a45 55%,#1c8c74); }
   .card--sail .card__media{ background:linear-gradient(160deg,#158a72,#3fc9b0 55%,#dff5e8); }
-  .card--freedive .card__media{ background:linear-gradient(160deg,#02100c,#0f4038 60%,#158a72); }
+  .card--freedive .card__media{ background:linear-gradient(160deg,#010609,#0a2530 60%,#158a72); }
   .card--storm .card__media{ background:linear-gradient(160deg,#1c2420,#3d5c52 55%,#7fae9e); }
   .card__badge{
     position:absolute;
@@ -363,7 +363,7 @@
     font-size:0.65rem;
     letter-spacing:0.08em;
     text-transform:uppercase;
-    background:rgba(11,46,40,0.55);
+    background:rgba(7,28,36,0.55);
     padding:5px 9px;
     border-radius:20px;
     backdrop-filter:blur(4px);
@@ -373,7 +373,7 @@
     position:absolute;
     left:0; right:0; bottom:0;
     padding:16px 16px 14px;
-    background:linear-gradient(0deg, rgba(6,26,22,0.85), transparent);
+    background:linear-gradient(0deg, rgba(4,15,19,0.85), transparent);
   }
   .card__caption h3{
     font-family:var(--font-display);
@@ -411,8 +411,8 @@
     border:none;
     padding:0;
   }
-  .reel--a{ background:linear-gradient(200deg,#0f5c50,#1c8c74 60%,#21c7b0); }
-  .reel--b{ background:linear-gradient(200deg,#02100c,#0f5c50 55%,#158a72); }
+  .reel--a{ background:linear-gradient(200deg,#0e3a45,#1c8c74 60%,#21c7b0); }
+  .reel--b{ background:linear-gradient(200deg,#010609,#0e3a45 55%,#158a72); }
   .reel--c{ background:linear-gradient(200deg,#1c2420,#3d5c52 60%,#5c8a76); }
   .reel--d{ background:linear-gradient(200deg,#158a72,#3fc9b0 55%,#a8e6cf); }
   .reel__play{
@@ -432,7 +432,7 @@
     position:absolute;
     left:0; right:0; bottom:0;
     padding:14px;
-    background:linear-gradient(0deg, rgba(6,26,22,0.85), transparent);
+    background:linear-gradient(0deg, rgba(4,15,19,0.85), transparent);
     font-family:var(--font-mono);
     font-size:0.7rem;
     letter-spacing:0.04em;
@@ -458,7 +458,7 @@
     border-radius:3px;
     background:
       radial-gradient(70% 70% at 30% 20%, rgba(255,111,89,0.14), transparent 60%),
-      linear-gradient(160deg,#0f4038,#0f5c50 55%,#158a72);
+      linear-gradient(160deg,#0a2530,#0e3a45 55%,#158a72);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -546,7 +546,7 @@
     position:fixed;
     inset:0;
     z-index:200;
-    background:rgba(4,18,15,0.92);
+    background:rgba(4,12,15,0.92);
     display:none;
     align-items:center;
     justify-content:center;
@@ -565,7 +565,7 @@
     position:absolute;
     left:0; right:0; bottom:0;
     padding:22px;
-    background:linear-gradient(0deg, rgba(6,26,22,0.9), transparent);
+    background:linear-gradient(0deg, rgba(4,15,19,0.9), transparent);
   }
   .lightbox__caption h3{
     font-family:var(--font-display);
@@ -598,7 +598,7 @@
       top:var(--nav-h);
       right:0;
       flex-direction:column;
-      background:rgba(11,46,40,0.97);
+      background:rgba(7,28,36,0.97);
       width:220px;
       padding:24px;
       gap:20px;
